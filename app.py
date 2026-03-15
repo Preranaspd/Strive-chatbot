@@ -5,7 +5,25 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+
+def get_groq_api_key() -> str | None:
+    key = os.getenv("GROQ_API_KEY")
+    if key:
+        return key
+
+    try:
+        return st.secrets["GROQ_API_KEY"]
+    except Exception:
+        return None
+
+
+api_key = get_groq_api_key()
+if not api_key:
+    st.error("Missing GROQ_API_KEY. Add it to Streamlit Secrets or environment variables.")
+    st.info("For Streamlit Cloud, add GROQ_API_KEY in App settings -> Secrets.")
+    st.stop()
+
+client = Groq(api_key=api_key)
 
 st.title("Strive")
 st.caption("Let's figure it out.")
@@ -49,10 +67,14 @@ if user_input:
     messages = [{"role":"system","content":system_prompt}] + st.session_state.messages
     messages.append({"role":"user","content":user_input})
 
-    response = client.chat.completions.create(
-       model="llama-3.3-70b-versatile",
-       messages=messages,
-   )
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=messages,
+        )
+    except Exception as exc:
+        st.error(f"Groq request failed: {exc}")
+        st.stop()
 
     reply = response.choices[0].message.content
 
