@@ -26,7 +26,7 @@ if not api_key:
 
 client = Groq(api_key=api_key)
 
-st.title("Strive")
+st.title(" Strive🚀")
 st.caption("Let's figure it out.")
 
 system_prompt = """
