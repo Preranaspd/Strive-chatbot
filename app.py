@@ -2,11 +2,12 @@ import os
 import streamlit as st
 from groq import Groq
 from dotenv import load_dotenv
+from typing import Optional
 
 load_dotenv()
 
 
-def get_groq_api_key() -> str | None:
+def get_groq_api_key() -> Optional[str]:
     key = os.getenv("GROQ_API_KEY")
     if key:
         return key
